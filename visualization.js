@@ -164,31 +164,18 @@ d3.json('result.json', function (error, dataAgg){
 			  
 		translate = [d3.event.translate[0], 0];
 		svg.attr("transform", "translate(" + translate + ")scale(" + d3.event.scale + ", 1)");
-		/*$(".vals").each(function(i, obj) {
-    			
-			if(vals.length < numtext){
-				vals[i] = $(this).attr("x")
-			} 
-			console.log($(this))
-			console.log($(this).attr("x"))
-			
-			val = vals[i] * d3.event.scale + d3.event.translate[0];
-		
-			$(this).attr("x", val);
-		});*/
+	
 		
 		d3.selectAll(".vals").each(function(i, d){
-			console.log(d3.select(this))
-			console.log(d3.select(this).attr("x"))
+			
 			if(vals.length < numtext){
 				vals[d] = d3.select(this).attr("x")
 			} 
-			console.log(vals)
+		
 			val = vals[d] * d3.event.scale + d3.event.translate[0];
 		
 			d3.select(this).attr("x", val);
 
-			//console.log(vals)
 		})
 	}
 			
