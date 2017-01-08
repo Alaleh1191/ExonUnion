@@ -9,6 +9,8 @@ import sys
 #Initializing of important variables
 startGlobal = 0
 endGlobal   = 0
+i           = 0
+maxLine     = 0
 
 #Start and End values must contain the largest length of all the exonUnions
 jsonValues = {  'options' : {'start' : startGlobal, 'end' : endGlobal},
@@ -22,7 +24,18 @@ geneIdSortedFile    = open(sys.argv[2], 'r')
 geneIdSortedLine        = geneIdSortedFile.readline()
 geneIdSortedLineSplit   = geneIdSortedLine.split()
 
+#Determine if there is a threshold
+if(len(sys.argv) == 4):
+    maxLine = int(sys.argv[3])
+else:
+    maxLine = 0
+
 for line in exonUnionFile:
+    i += 1
+
+    if maxLine != 0 and i > maxLine:
+        break
+
     lineSplit = line.split()
     lineRESplit = re.findall('\[[^\[]*\]', line)
 
