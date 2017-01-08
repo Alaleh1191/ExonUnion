@@ -85,7 +85,8 @@ for line in exonUnionFile:
 #   jsonValues['values'].append({'name' : name, 'startx': start, 'endx' : end, 'exons' : exons, 'transcripts': transcripts})
 
 #Insert the largest length of all the exonUnions
-jsonValues['options'] = {'start' : startGlobal, 'end' : endGlobal}
+height = i*10*5
+jsonValues['options'] = {'start' : startGlobal, 'end' : endGlobal, 'height' : height}
 
 #Close files
 exonUnionFile.close()
