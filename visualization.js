@@ -177,7 +177,7 @@ d3.json('result.json', function (error, dataAgg){
 		});
 		
 		d3.selectAll(".vals").each(function(d){
-
+			console.log(d3.select(this))
 			//console.log(vals)
 		})
 	}
