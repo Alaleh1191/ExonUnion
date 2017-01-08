@@ -26,7 +26,7 @@
 
 	   		
 	   		var numtext = 0;
-			d3.json('test.json', function (error, dataAgg){
+			d3.json('result.json', function (error, dataAgg){
 				var xScale = d3.scale.linear()
                          .domain(
                          		[0,dataAgg.options.end-dataAgg.options.start]
