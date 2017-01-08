@@ -169,16 +169,16 @@ d3.json('result.json', function (error, dataAgg){
 			if(vals.length < numtext){
 				vals[i] = $(this).attr("x")
 			} 
-			console.log(vals)
+			//console.log(vals)
 			
 			val = vals[i] * d3.event.scale + d3.event.translate[0];
 		
 			$(this).attr("x", val);
 		});
 		
-		/*d3.selectAll(".vals").each(function(d){
+		d3.selectAll(".vals").each(function(d){
 			console.log(vals)
-		})*/
+		})
 	}
 			
 })
