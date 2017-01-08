@@ -181,9 +181,10 @@ d3.json('result.json', function (error, dataAgg){
 			console.log(d3.select(this))
 			console.log(d3.select(this).attr("x"))
 			if(vals.length < numtext){
-				vals[i] = d3.select(this).attr("x")
+				vals[d] = d3.select(this).attr("x")
 			} 
-			val = vals[i] * d3.event.scale + d3.event.translate[0];
+			console.log(vals)
+			val = vals[d] * d3.event.scale + d3.event.translate[0];
 		
 			d3.select(this).attr("x", val);
 
