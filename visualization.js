@@ -164,7 +164,7 @@ d3.json('result.json', function (error, dataAgg){
 			  
 		translate = [d3.event.translate[0], 0];
 		svg.attr("transform", "translate(" + translate + ")scale(" + d3.event.scale + ", 1)");
-		d3.select(".vals").each(function(i, obj) {
+		$(".vals").each(function(i, obj) {
     			
 			if(vals.length < numtext){
 				vals[i] = $(this).attr("x")
@@ -172,10 +172,13 @@ d3.json('result.json', function (error, dataAgg){
 			console.log(vals)
 			
 			val = vals[i] * d3.event.scale + d3.event.translate[0];
-			//console.log(val);
+		
 			$(this).attr("x", val);
 		});
 		
+		/*d3.selectAll(".vals").each(function(d){
+			console.log(vals)
+		})*/
 	}
 			
 })
