@@ -164,7 +164,7 @@ d3.json('result.json', function (error, dataAgg){
 			  
 		translate = [d3.event.translate[0], 0];
 		svg.attr("transform", "translate(" + translate + ")scale(" + d3.event.scale + ", 1)");
-		$(".vals").each(function(i, obj) {
+		d3.select(".vals").each(function(i, obj) {
     			
 			if(vals.length < numtext){
 				vals[i] = $(this).attr("x")
