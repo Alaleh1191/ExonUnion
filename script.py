@@ -41,7 +41,7 @@ for line in exonUnionFile:
 
     name    = lineSplit[0]
     start   = int(re.search('\d+', lineRESplit[3]).group())
-    end     = int(re.search('\d+', lineRESplit[4]).group())
+    end     = ast.literal_eval(lineRESplit[4])[-1]
 
     #Assess if this exonUnion is greater than the previous one
     if((endGlobal - startGlobal) < (end - start)):
