@@ -80,7 +80,9 @@ for line in exonUnionFile:
         if(name != transcriptName):
             break
 
-    jsonValues['values'].append({'name' : name, 'startx': start, 'endx' : end, 'exons' : exons, 'transcripts': transcripts})
+    union = {'startx':start, 'endx' : end, 'exons': exons}
+    jsonValues['values'].append({'name' : name, 'union' : union, 'transcripts': transcripts})
+#   jsonValues['values'].append({'name' : name, 'startx': start, 'endx' : end, 'exons' : exons, 'transcripts': transcripts})
 
 #Insert the largest length of all the exonUnions
 jsonValues['options'] = {'start' : startGlobal, 'end' : endGlobal}
