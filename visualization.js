@@ -2,7 +2,7 @@ var width = 960;
 var numtext = 0;
 
 // open the json file			
-d3.json('result.json', function (error, dataAgg){
+d3.json('Results/result.json', function (error, dataAgg){
 	
 	// Get the scale of the x-Axis based on start and end of largest gene
 	var xScale = d3.scale.linear()
