@@ -1,4 +1,4 @@
-#Usage: python ./script.py <exonUnionFileName> <IndividualTranscriptFileName>
+#Usage: python ./script.py <exonUnionFileName> <IndividualTranscriptFileName> <the number of Genes, default goes through the whole file>
 
 #Imports
 import json
@@ -12,7 +12,7 @@ endGlobal   = 0
 i           = 0
 maxLine     = 0
 
-#Start and End values must contain the largest length of all the exonUnions
+#Start and End values contains the start and end of the longest gene
 jsonValues = {  'options' : {'start' : startGlobal, 'end' : endGlobal},
                 'values' : []
              }
@@ -24,16 +24,16 @@ geneIdSortedFile    = open(sys.argv[2], 'r')
 geneIdSortedLine        = geneIdSortedFile.readline()
 geneIdSortedLineSplit   = geneIdSortedLine.split()
 
-#Determine if there is a threshold
+#Determine if there is a threshold on how many genes
 if(len(sys.argv) == 4):
     maxLine = int(sys.argv[3])
-else:
+else: #read the whole file
     maxLine = 0
 
 for line in exonUnionFile:
     i += 1
 
-    if maxLine != 0 and i > maxLine:
+    if maxLine != 0 and i > maxLine: #if reached max number of genes
         break
 
     lineSplit = line.split()
@@ -43,16 +43,16 @@ for line in exonUnionFile:
     start   = int(re.search('\d+', lineRESplit[3]).group())
     end     = ast.literal_eval(lineRESplit[4])[-1]
 
-    #Assess if this exonUnion is greater than the previous one
+    #Assess if this gene (the union of its transcript), has a larger length
     if((endGlobal - startGlobal) < (end - start)):
         startGlobal = start
         endGlobal   = end
 
-    #Retrieve the exons
+    #Retrieve the unionized exons
     exonsString = re.search('\[\[.*\]\]', line).group()
     exons = ast.literal_eval(exonsString)
 
-    #Retrieve the transcripts from the geneIdSortedFile
+    #Retrieve the transcripts from the individual transcripts file
     transcripts = []
 
     while True:
@@ -82,9 +82,8 @@ for line in exonUnionFile:
 
     union = {'startx':start, 'endx' : end, 'exons': exons}
     jsonValues['values'].append({'name' : name, 'union' : union, 'transcripts': transcripts})
-#   jsonValues['values'].append({'name' : name, 'startx': start, 'endx' : end, 'exons' : exons, 'transcripts': transcripts})
 
-#Insert the largest length of all the exonUnions
+#Insert the start and end of the largest gene, and estimate the height of the svg
 height = i*10*5
 jsonValues['options'] = {'start' : startGlobal, 'end' : endGlobal, 'height' : height}
 
