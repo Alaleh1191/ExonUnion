@@ -75,7 +75,7 @@ d3.json('Results/result.json', function (error, dataAgg){
         numtext++;
 
 		// The unionized exons plotting
-		for(var j = 0; j < dataAgg.values[i].union.exons.length; j++){
+		for(var j = 0; j < dataAgg.values[i].union.exonStart.length; j++){
 
 			svg.append("rect")
 		        .attr("x", xScale(dataAgg.values[i].union.exonStart[j]) - xScale(dataAgg.values[i].union.startx))
