@@ -70,7 +70,8 @@ d3.json('Results/result.json', function (error, dataAgg){
             .attr("y", yloc+4)
             .text(dataAgg.values[i].name)
             .attr("font-family", "sans-serif")
-            .style("font-size", "10px");
+            .style("font-size", "10px")
+            .style('pointer-events', 'none');
 
         numtext++;
 
@@ -131,7 +132,8 @@ d3.json('Results/result.json', function (error, dataAgg){
                 .attr("y", yloc+4)
                 .text(dataAgg.values[i].transcripts[j].name)
                 .attr("font-family", "sans-serif")
-                .style("font-size", "10px");
+                .style("font-size", "10px")
+                .style('pointer-events', 'none');
 
             numtext++;
 
