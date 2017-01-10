@@ -1,5 +1,7 @@
 from __future__ import print_function
 
+__author__ = "Alaleh Azhir,Peter Kerpedjiev"
+
 #!/usr/bin/python
 
 import collections as col
@@ -12,7 +14,7 @@ def main():
     python ExonUnion.py Calculate the union of the exons of a list
     of transcript.
 
-    chr10   27035524        27150016        ABI1    76      -       NM_001178120    10006   protein-coding  abl-interactor 1        27037498        27149792        10      27035524,27040526,27047990,27054146,27057780,27059173,27060003,27065993,27112066,27149675,      27037674,27040712,27048164,27054247,27057921,27059274,27060018,27066170,27112234,27150016,
+    chr10   27035524        27150016        ABI1    76      -       NM_001178120    10006   protein-coding  abl-interactor 1        27037498        27149792        27035524,27040526,27047990,27054146,27057780,27059173,27060003,27065993,27112066,27149675,      27037674,27040712,27048164,27054247,27057921,27059274,27060018,27066170,27112234,27150016,
 """)
 
     parser.add_argument('transcript_bed')
@@ -61,9 +63,8 @@ def main():
         geneDesc = words[9]
         cdsStart = words[10]
         cdsEnd = words[11]
-        numExons = words[12]
-        exonStarts = words[13]
-        exonEnds = words[14]
+        exonStarts = words[12]
+        exonEnds = words[13]
 
         txStarts[geneId] = min(txStarts[geneId], int(txStart))
         txEnds[geneId] = max(txEnds[geneId], int(txEnd))
@@ -92,7 +93,7 @@ def main():
         output = "\t".join(map(str, [geneChrs[geneId], txStarts[geneId], txEnds[geneId],
                             geneNames[geneId], geneScores[geneId], geneStrands[geneId],
                             'union_' + geneId, geneId, geneTypes[geneId], geneDescs[geneId],
-                            cdsStarts[geneId], cdsEnds[geneId], len(exonUnions[geneId]),
+                            cdsStarts[geneId], cdsEnds[geneId], 
                             ",".join([str(e[0]) for e in sorted(exonUnions[geneId])]),
                             ",".join([str(e[1]) for e in sorted(exonUnions[geneId])])]))
         print(output)
