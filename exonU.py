@@ -1,132 +1,107 @@
+from __future__ import print_function
+
+__author__ = "Alaleh Azhir,Peter Kerpedjiev"
+
+#!/usr/bin/python
+
+import collections as col
+import sys
+import argparse
+
 def main():
-	inputFile = open ('Results/geneIdSorted.bedGraph', 'r')
-	outputFile = open ('Results/exonUnion.txt', 'w')
+    parser = argparse.ArgumentParser(description="""
+    
+    python ExonUnion.py Calculate the union of the exons of a list
+    of transcript.
 
-	values = {}
-	geneName = ""
-	exonStarts = []
-	exonEnds = []
-	exonIntervals = []
-	words1 = []
-	words2 = []
-	strand = []
-	transcriptStart = []
-	transcriptEnd = []
-	codingStart = []
-	codingEnd = []
-	exons = []
-	score = []
-	words12 = []
-	words13 = []
-	words14 = []
-	words15 = []
-	chrName = ""
-	i = 1
-	for line in inputFile:
-		i += 1
-#		if(i == 5):
-#			break
-		words = line.split(" ")
-		#if(chrName == ""):
-		#	chrName = words[3]
-		#if(chrName != words[3]):
-		#	chrName = words[3]
-		#	geneName = ""
-		if(geneName == ""):
-			geneName = words[0]
-			exonStarts = []
-			exonEnds =[]
-			exonIntervals = []
-			words1 = []
-			words2 = []
-			strand = []
-			transcriptStart = []
-			transcriptEnd = []
-			codingStart = []
-			codingEnd = []
-			score = []
-			words12 = []
-			words13 = []
-			words14 = []
-			words15 = []
-		
-#		print(geneName)
-		
-		if(geneName != words[0]):
-			#exonStarts = sorted(set(exonStarts))
-#			print("hi")
-#			#exonEnds = sorted(set(exonEnds))
-			
-			exonIntervals = [list(t) for t in set(tuple(element) for element in exonIntervals)]
-			words1 = sorted(set(words1))
-			words2 = sorted(set(words2))
-			strand = sorted(set(strand))
-			transcriptStart = sorted(set(transcriptStart))
-			transcriptEnd = sorted(set(transcriptEnd))
-			codingStart = sorted(set(codingStart))
-			codingEnd = sorted(set(codingEnd))
-			score = sorted(set(score))
-			words12 = sorted(set(words12))
-			words13 = sorted(set(words13))
-			words14 = sorted(set(words14))
-			words15 = sorted(set(words15))
-			exonCount = len(exonIntervals)
-			string = "{} {} {} {} {} {} {} {} {} {} {} {} {} {} {} {}".format(geneName, words1, words2, words[3], strand, transcriptStart, transcriptEnd, codingStart, codingEnd, exonCount, exonIntervals, score, words12, words13, words14, words15)
-			print(string, file = outputFile, end = '\n')
-			exonStarts = []
-			exonIntervals = []
-			exonEnds = []
-			words1 = []
-			words2 = []
-			strand = []
-			transcriptStart = []
-			transcriptEnd = []
-			codingStart = []
-			codingEnd = []
-			score = []
-			words12 = []
-			words13 = []
-			words14 = []
-			words15 = []
-			geneName = words[0]
-		
+    chr10   27035524        27150016        ABI1    76      -       NM_001178120    10006   protein-coding  abl-interactor 1        27037498        27149792        27035524,27040526,27047990,27054146,27057780,27059173,27060003,27065993,27112066,27149675,      27037674,27040712,27048164,27054247,27057921,27059274,27060018,27066170,27112234,27150016,
+""")
 
-		exons = words[10].split(",")
-		del exons[-1]
-		exonStarts.extend(map(int, exons))
-		exons = words[11].split(",")
-		del exons[-1]
-		exonEnds.extend(map(int, exons))
-		for start, end in zip(exonStarts, exonEnds):
-			exonIntervals.append([start,end])
-		words1.append(words[1])
-		words2.append(words[2])
-		strand.append(words[4])
-		transcriptStart.append(int(words[5]))
-		transcriptEnd.append(int(words[6]))
-		codingStart.append(int(words[7]))
-		codingEnd.append(int(words[8]))
-		score.append(int(words[12]))
-		words12.append(words[13])
-		words13.append(words[14])
-		words14.append(words[15])
-		words15.append(words[16])
-	
-	exonIntervals = [list(t) for t in set(tuple(element) for element in exonIntervals)]
-	words1 = sorted(set(words1))
-	words2 = sorted(set(words2))
-	strand = sorted(set(strand))
-	transcriptStart = sorted(set(transcriptStart))
-	transcriptEnd = sorted(set(transcriptEnd))
-	codingStart = sorted(set(codingStart))
-	codingEnd = sorted(set(codingEnd))
-	score = sorted(set(score))
-	words12 = sorted(set(words12))
-	words13 = sorted(set(words13))
-	words14 = sorted(set(words14))
-	words15 = sorted(set(words15))
-	exonCount = len(exonIntervals)
-	string = "{} {} {} {} {} {} {} {} {} {} {} {} {} {} {} {}".format(geneName, words1, words2, words[3], strand, transcriptStart, transcriptEnd, codingStart, codingEnd, exonCount, exonIntervals, score, words12, words13, words14, words15)
-	print(string, file = outputFile, end = '\n')
+    parser.add_argument('transcript_bed')
+    #parser.add_argument('-o', '--options', default='yo',
+    #					 help="Some option", type='str')
+    #parser.add_argument('-u', '--useless', action='store_true', 
+    #					 help='Another useless option')
+    args = parser.parse_args()
 
-if __name__ == "__main__": main() 
+    inputFile = open(args.transcript_bed, 'r')
+
+    # a dictionary to hold sets of tuples of exons, indexed by geneId
+    exonUnions = col.defaultdict(set)
+
+    # For each gene, we'll maintain the minimum and maximum transcription
+    # start and end site, respectively
+    txStarts = col.defaultdict(lambda: sys.maxint)
+    txEnds = col.defaultdict(lambda: -sys.maxint)
+
+    # do the same thing with coding sequence starts and ends
+    cdsStarts = col.defaultdict(lambda: sys.maxint)
+    cdsEnds = col.defaultdict(lambda: -sys.maxint)
+
+    # gene types, chromosomes, strands, names, scores and descriptions should be the same across 
+    # all transcripts for a gene
+    geneDescs = {}
+    geneTypes = {}
+    geneStrands = {}
+    geneScores = {}
+    geneChrs = {}
+    geneNames = {}
+
+
+    for line in inputFile:
+        words = line.strip().split("\t")
+
+        chrName = words[0]
+        txStart = words[1]
+        txEnd = words[2]
+        geneName = words[3]
+        score = words[4]
+        strand = words[5]
+        refseqId = words[6]
+        geneId = words[7]
+        geneType = words[8]
+        geneDesc = words[9]
+        cdsStart = words[10]
+        cdsEnd = words[11]
+        exonStarts = words[12]
+        exonEnds = words[13]
+
+        txStarts[geneId] = min(txStarts[geneId], int(txStart))
+        txEnds[geneId] = max(txEnds[geneId], int(txEnd))
+
+        cdsStarts[geneId] = min(cdsStarts[geneId], int(cdsStart))
+        cdsEnds[geneId] = max(cdsEnds[geneId], int(cdsEnd))
+
+        geneDescs[geneId] = geneDesc
+        geneStrands[geneId] = strand
+        geneScores[geneId] = score
+        geneTypes[geneId] = geneType
+        geneChrs[geneId] = chrName
+        geneNames[geneId] = geneName
+
+
+        # for some reason, exon starts and ends have trailing commas
+        exonStartParts = exonStarts.strip(",").split(',')
+        exonEndParts = exonEnds.strip(",").split(',')
+
+        # add each exon to this gene's set of exon unions
+        for exonStart,exonEnd in zip(exonStartParts, exonEndParts):
+            exonUnions[geneId].add((int(exonStart), int(exonEnd)))
+
+    
+    for geneId in exonUnions:
+        output = "\t".join(map(str, [geneChrs[geneId], txStarts[geneId], txEnds[geneId],
+                            geneNames[geneId], geneScores[geneId], geneStrands[geneId],
+                            'union_' + geneId, geneId, geneTypes[geneId], geneDescs[geneId],
+                            cdsStarts[geneId], cdsEnds[geneId], 
+                            ",".join([str(e[0]) for e in sorted(exonUnions[geneId])]),
+                            ",".join([str(e[1]) for e in sorted(exonUnions[geneId])])]))
+        print(output)
+
+
+
+if __name__ == '__main__':
+    main()
+
+
+

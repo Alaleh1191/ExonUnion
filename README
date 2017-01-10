@@ -1,0 +1,6 @@
+# Input example line:
+# chr19   58858171        58864865        A1BG    23      -       NM_130786       1       protein-coding  alpha-1-B glycoprotein  58858387        58864803        8       58858171,58858718,58861735,58862756,58863648,58864293,58864657,58864769,        58858395,58859006,58862017,58863053,58863921,58864563,58864693,58864865,
+# Output example line:
+# chr5    176022802       176037131       GPRIN1  7       -       union_114787    114787  protein-coding  G protein regulated inducer of neurite outgrowth 1      176023808       176026835       2       176022802,176036999     176026878,176037131
+
+python exonU.py geneAnnotations.bed > geneAnnotationsExonUnions.bed
