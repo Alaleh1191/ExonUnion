@@ -41,7 +41,7 @@ else
     python ./sort.py "$inputFile" -g "$geneCol" -c "$chrCol"
 fi
 
-python3.6 ./exonU.py
+python ./exonU.py
 
 
 python ./create_json.py "Results/exonUnion.txt" "Results/geneIdSorted.bedGraph" "$lineMax"
