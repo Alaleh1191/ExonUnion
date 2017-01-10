@@ -5,12 +5,16 @@ import json
 import re
 import ast
 import sys
+import collections as col
 
 #Initializing of important variables
 startGlobal = 0
 endGlobal   = 0
 i           = 0
 maxLine     = 0
+unions = col.defaultdict(set)
+transcripts = col.defaultdict(list)
+
 
 #Start and End values contains the start and end of the longest gene
 jsonValues = {  'options' : {'start' : startGlobal, 'end' : endGlobal},
@@ -19,10 +23,10 @@ jsonValues = {  'options' : {'start' : startGlobal, 'end' : endGlobal},
 
 #Opening files
 exonUnionFile       = open(sys.argv[1], 'r')
-geneIdSortedFile    = open(sys.argv[2], 'r')
+inputFile           = open(sys.argv[2], 'r')
 
-geneIdSortedLine        = geneIdSortedFile.readline()
-geneIdSortedLineSplit   = geneIdSortedLine.split()
+inputLine        = inputFile.readline()
+inputLineSplit   = inputLine.split()
 
 #Determine if there is a threshold on how many genes
 if(len(sys.argv) == 4):
@@ -30,18 +34,23 @@ if(len(sys.argv) == 4):
 else: #read the whole file
     maxLine = 0
 
+#retrieve the genes
+geneIds = []
+
 for line in exonUnionFile:
     i += 1
 
     if maxLine != 0 and i > maxLine: #if reached max number of genes
         break
 
-    lineSplit = line.split()
+    lineSplit = line.strip().split("\t")
     lineRESplit = re.findall('\[[^\[]*\]', line)
 
-    name    = lineSplit[0]
-    start   = int(re.search('\d+', lineRESplit[3]).group())
-    end     = ast.literal_eval(lineRESplit[4])[-1]
+ #   name    = lineSplit[3]
+    start   = int(lineSplit[1])
+    end     = int(lineSplit[2])
+    geneId  = int(lineSplit[7])
+    geneIds.append(geneId)
 
     #Assess if this gene (the union of its transcript), has a larger length
     if((endGlobal - startGlobal) < (end - start)):
@@ -49,39 +58,36 @@ for line in exonUnionFile:
         endGlobal   = end
 
     #Retrieve the unionized exons
-    exonsString = re.search('\[\[.*\]\]', line).group()
-    exons = ast.literal_eval(exonsString)
+    exonStart = ast.literal_eval(lineSplit[12])
+    exonEnd = ast.literal_eval(lineSplit[13])
 
-    #Retrieve the transcripts from the individual transcripts file
-    transcripts = []
+    union = {'startx':start, 'endx' : end, 'exonStart': exonStart, 'exonEnd' : exonEnd}
+    unions[geneId] = union;
 
-    while True:
-        # Retrieve the values
-        transcriptGene = geneIdSortedLineSplit[2]
-        transcriptStart = geneIdSortedLineSplit[5]
-        transcriptEnd   = geneIdSortedLineSplit[6]
-        transcriptExonStart = ast.literal_eval(geneIdSortedLineSplit[10])
-        transcriptExonEnd   = ast.literal_eval(geneIdSortedLineSplit[11])
+    
+
+
+for line in inputFile:
+    inputLineSplit = line.strip().split("\t")
+
+    geneId  = int(inputLineSplit[7])
+    if geneId not in geneIds:
+        continue
+    else:
+        transcriptName = inputLineSplit[6]
+        transcriptStart = inputLineSplit[1]
+        transcriptEnd   = inputLineSplit[2]
+        transcriptExonStart = ast.literal_eval(inputLineSplit[12])
+        transcriptExonEnd   = ast.literal_eval(inputLineSplit[13])
 
         #Store the values
-        transcript = {'name' : transcriptGene, 'startx': transcriptStart, 'endx': transcriptEnd,
+        transcript = {'name' : transcriptName, 'startx': transcriptStart, 'endx': transcriptEnd,
                       'exonStart': transcriptExonStart, 'exonEnd': transcriptExonEnd}
-        transcripts.append(transcript)
+        transcripts[geneId].append(transcript)
 
-        #Retrieve next line and read the name
-        geneIdSortedLine = geneIdSortedFile.readline()
-        if(geneIdSortedLine == ''):
-            break
 
-        geneIdSortedLineSplit = geneIdSortedLine.split()
-        transcriptName = geneIdSortedLineSplit[0]
-
-        #Determine if the name is the same
-        if(name != transcriptName):
-            break
-
-    union = {'startx':start, 'endx' : end, 'exons': exons}
-    jsonValues['values'].append({'name' : name, 'union' : union, 'transcripts': transcripts})
+for geneId in geneIds:
+    jsonValues['values'].append({'name' : geneId, 'union' : unions[geneId], 'transcripts': transcripts[geneId]})
 
 #Insert the start and end of the largest gene, and estimate the height of the svg
 height = i*10*5
@@ -89,6 +95,7 @@ jsonValues['options'] = {'start' : startGlobal, 'end' : endGlobal, 'height' : he
 
 #Close files
 exonUnionFile.close()
-geneIdSortedFile.close()
+inputFile.close()
+
 with open('Results/result.json', 'w') as resultJSONFile:
     json.dump(jsonValues, resultJSONFile)

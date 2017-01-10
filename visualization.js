@@ -75,25 +75,21 @@ d3.json('Results/result.json', function (error, dataAgg){
         numtext++;
 
 		// The unionized exons plotting
-		for(var j = 0; j < dataAgg.values[i].union.exons.length; j++){
+		for(var j = 0; j < dataAgg.values[i].union.exonStart.length; j++){
 
 			svg.append("rect")
-		        .attr("x", xScale(dataAgg.values[i].union.exons[j][0]) - xScale(dataAgg.values[i].union.startx))
+		        .attr("x", xScale(dataAgg.values[i].union.exonStart[j]) - xScale(dataAgg.values[i].union.startx))
 		        .attr("y", yex)
-		        .attr("width", xScale(dataAgg.values[i].union.exons[j][1]) - xScale(dataAgg.values[i].union.exons[j][0]))
+		        .attr("width", xScale(dataAgg.values[i].union.exonEnd[j]) - xScale(dataAgg.values[i].union.exonStart[j]))
 		        .attr("height", 6)
 		        .style("fill", "red");
         }	
         
         // the end of the last exon
-        var end = d3.max(dataAgg.values[i].union.exons, function(array) {
-		  return d3.max(array);
-		});
+        var end = d3.max(dataAgg.values[i].union.exonEnd)
 
         // The start of the first exon 
-		var start = d3.min(dataAgg.values[i].union.exons, function(array) {
-		  return d3.min(array);
-		});
+		var start = d3.min(dataAgg.values[i].union.exonStart)
         
         // Distance between the end of the gene and the end of the last exon
         svg.append("rect")
