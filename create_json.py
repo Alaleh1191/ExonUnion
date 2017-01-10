@@ -91,5 +91,5 @@ jsonValues['options'] = {'start' : startGlobal, 'end' : endGlobal, 'height' : he
 exonUnionFile.close()
 geneIdSortedFile.close()
 
-with open('result.json', 'w') as resultJSONFile:
+with open('Results/result.json', 'w') as resultJSONFile:
     json.dump(jsonValues, resultJSONFile)

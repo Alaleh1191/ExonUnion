@@ -1,6 +1,6 @@
 def main():
-	inputFile = open ('geneIdSorted.bedGraph', 'r')
-	outputFile = open ('exonUnionFinal.txt', 'w')
+	inputFile = open ('Results/geneIdSorted.bedGraph', 'r')
+	outputFile = open ('Results/exonUnion.txt', 'w')
 
 	values = {}
 	geneName = ""
