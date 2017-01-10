@@ -112,6 +112,7 @@ d3.json('Results/result.json', function (error, dataAgg){
         yend += 10;
 		yloc += 10;
 
+
 		//Plotting individual transcripts
 		for(var j = 0; j < dataAgg.values[i].transcripts.length; j++){
 
@@ -198,10 +199,3 @@ d3.json('Results/result.json', function (error, dataAgg){
 	}
 			
 })
-			
-
-
-			
-
-
-			
