@@ -12,38 +12,36 @@ d3.json('Results/result.json', function (error, dataAgg){
         .range([0,800]);
 
 
-    var height = dataAgg.options.height;
+    var height = window.innerHeight - 100;
 
-    // Zooming behavior, only zoom on the x-Axis
+
 	var zoom = d3.behavior.zoom()
 	    .x(xScale)
 	    .on("zoom", zoomed);
 
+
+
+    var drag = d3.behavior.drag()
+     .on("drag", dragging)
+
+
 	// Create the svg
-	var svg = d3.select("body").append("svg")
+	var svg = d3.select("body")
+		.append("svg")
 		.attr("class" , "svg")
 	    .attr("width", width)
 	    .attr("height", height)
 	  	.append("g")
 	    .call(zoom)
+	    .call(drag)
 	  	.append("g")
 	  	.attr("class", "g");
 	    
-	// Create the x-Axis
-	var xAxis = d3.svg.axis()
-	    .scale(xScale)
-	    .orient("bottom")
-	    .tickSize(-height);
-
-	svg.append("g")
-	    .attr("class", "x axis")
-	    .attr("transform", "translate(0," + height + ")")
-	    .call(xAxis);
 
     svg.append("rect")
 	    .attr("class", "overlay")
 	    .attr("width", width)
-	    .attr("height", height)
+	    .attr("height", dataAgg.options.height)
 
 
 	var yloc = 12; // y location of the line representing the gene
@@ -176,29 +174,62 @@ d3.json('Results/result.json', function (error, dataAgg){
 	}
 
 	// array holding the position of text fields, used for zooming
-	var vals = []; 
-
+	var vals = [];
+	var valsY = []; 
+	var scale = 1;
+	var yTranslate = 0;
 
 	function zoomed() {
-		
-		// zoom behavior of svg	  
-		translate = [d3.event.translate[0], 0];
-		svg.attr("transform", "translate(" + translate + ")scale(" + d3.event.scale + ", 1)");
+		// if not dragging
+		if(d3.event.sourceEvent.type == "wheel"){
+			//zoom svg
+			translate = [d3.event.translate[0], yTranslate];
+			svg.attr("transform", "translate(" + translate + ")scale(" + d3.event.scale + ", 1)");
 	
-		// zoom behavior of texts 
+			// zoom behavior of texts 
+			d3.selectAll(".vals").each(function(i, d){
+				
+				if(vals.length < numtext){
+					vals[d] = d3.select(this).attr("x");
+					valsY[d] = d3.select(this).attr("y");
+				} 
+			
+				val = vals[d] * d3.event.scale + d3.event.translate[0];
+				valY = Number(valsY[d]) + yTranslate;
+				d3.select(this).attr("x", val);
+				d3.select(this).attr("y", valY);
+
+			})
+			scale = d3.event.scale;
+		}
+		
+	}
+
+	
+
+	function dragging(d) {
+
+	  	// translate the svg
+	  	var t = d3.transform(svg.attr("transform")).translate;
+	  	yTranslate = t[1] + d3.event.dy;
+      	svg.attr("transform", "translate(" + [t[0] + d3.event.dx, t[1] + d3.event.dy] + ")scale(" + scale + ", 1)");
+
+      	// translate behavior of texts 
 		d3.selectAll(".vals").each(function(i, d){
 			
 			if(vals.length < numtext){
-				vals[d] = d3.select(this).attr("x")
+				vals[d] = d3.select(this).attr("x");
+				valsY[d] = d3.select(this).attr("y");
 			} 
 		
-			val = vals[d] * d3.event.scale + d3.event.translate[0];
-		
+			val = vals[d] * scale + t[0] + d3.event.dx;
+			valY = Number(valsY[d]) + yTranslate;
 			d3.select(this).attr("x", val);
+			d3.select(this).attr("y", valY);
 
 		})
-	}
-			
+	};
+
 })
 			
 
